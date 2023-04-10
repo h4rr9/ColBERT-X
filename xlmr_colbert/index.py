@@ -13,13 +13,17 @@ from xlmr_colbert.indexing.encoder import CollectionEncoder
 def main():
     random.seed(12345)
 
-    parser = Arguments(description='Precomputing document representations with ColBERT.')
+    parser = Arguments(
+        description="Precomputing document representations with ColBERT."
+    )
 
     parser.add_model_parameters()
     parser.add_model_inference_parameters()
     parser.add_indexing_input()
 
-    parser.add_argument('--chunksize', dest='chunksize', default=6.0, required=False, type=float)   # in GiBs
+    parser.add_argument(
+        "--chunksize", dest="chunksize", default=6.0, required=False, type=float
+    )  # in GiBs
 
     args = parser.parse()
 
@@ -36,18 +40,20 @@ def main():
         distributed.barrier(args.rank)
 
         process_idx = max(0, args.rank)
-        encoder = CollectionEncoder(args, process_idx=process_idx, num_processes=args.nranks)
+        encoder = CollectionEncoder(
+            args, process_idx=process_idx, num_processes=args.nranks
+        )
         encoder.encode()
 
         distributed.barrier(args.rank)
 
         # Save metadata.
         if args.rank < 1:
-            metadata_path = os.path.join(args.index_path, 'metadata.json')
+            metadata_path = os.path.join(args.index_path, "metadata.json")
             print_message("Saving (the following) metadata to", metadata_path, "..")
             print(args.input_arguments)
 
-            with open(metadata_path, 'w') as output_metadata:
+            with open(metadata_path, "w") as output_metadata:
                 ujson.dump(args.input_arguments.__dict__, output_metadata)
 
         distributed.barrier(args.rank)

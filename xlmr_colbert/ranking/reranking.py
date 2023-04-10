@@ -20,7 +20,7 @@ def rerank(args):
     ranking_logger = RankingLogger(Run.path, qrels=None)
     milliseconds = 0
 
-    with ranking_logger.context('ranking.tsv', also_save_annotations=False) as rlogger:
+    with ranking_logger.context("ranking.tsv", also_save_annotations=False) as rlogger:
         queries = args.queries
         qids_in_order = list(queries.keys())
 
@@ -31,7 +31,7 @@ def rerank(args):
             rankings = []
 
             for query_idx, (q, pids) in enumerate(zip(qbatch_text, qbatch_pids)):
-                torch.cuda.synchronize('cuda:0')
+                torch.cuda.synchronize("cuda:0")
                 s = time.time()
 
                 Q = ranker.encode([q])
@@ -41,8 +41,16 @@ def rerank(args):
                 milliseconds += (time.time() - s) * 1000.0
 
                 if len(pids):
-                    print(qoffset+query_idx, q, len(scores), len(pids), scores[0], pids[0],
-                          milliseconds / (qoffset+query_idx+1), 'ms')
+                    print(
+                        qoffset + query_idx,
+                        q,
+                        len(scores),
+                        len(pids),
+                        scores[0],
+                        pids[0],
+                        milliseconds / (qoffset + query_idx + 1),
+                        "ms",
+                    )
 
                 rankings.append(zip(pids, scores))
 
@@ -55,7 +63,7 @@ def rerank(args):
                 ranking = [(score, pid, None) for pid, score in ranking]
                 rlogger.log(qid, ranking, is_ranked=True)
 
-    print('\n\n')
+    print("\n\n")
     print(ranking_logger.filename)
     print("#> Done.")
-    print('\n\n')
+    print("\n\n")

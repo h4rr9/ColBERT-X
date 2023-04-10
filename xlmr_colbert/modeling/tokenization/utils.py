@@ -1,7 +1,9 @@
 import torch
 
 
-def tensorize_triples(query_tokenizer, doc_tokenizer, queries, positives, negatives, bsize):
+def tensorize_triples(
+    query_tokenizer, doc_tokenizer, queries, positives, negatives, bsize
+):
     assert len(queries) == len(positives) == len(negatives)
     assert bsize is None or len(queries) % bsize == 0
 
@@ -25,12 +27,29 @@ def tensorize_triples(query_tokenizer, doc_tokenizer, queries, positives, negati
     negative_batches = _split_into_batches(negative_ids, negative_mask, bsize)
 
     batches = []
-    for (q_ids, q_mask), (p_ids, p_mask), (n_ids, n_mask) in zip(query_batches, positive_batches, negative_batches):
+    for (q_ids, q_mask), (p_ids, p_mask), (n_ids, n_mask) in zip(
+        query_batches, positive_batches, negative_batches
+    ):
         Q = (torch.cat((q_ids, q_ids)), torch.cat((q_mask, q_mask)))
         D = (torch.cat((p_ids, n_ids)), torch.cat((p_mask, n_mask)))
         batches.append((Q, D))
 
     return batches
+
+
+def tensorize_queries_documents(
+    query_tokenizer,
+    document_tokenizer,
+    queries_a,
+    queries_b,
+    documents_a,
+    documents_b,
+    bsize,
+):
+    # TODO: implement query document tensorize
+    assert len(queries_a) == len(queries_b) == len(documents_a) == len(documents_b)
+    assert bsize is None or len(queries_a) % bsize == 0
+    raise NotImplementedError("Tensorize Queries and Documents not implemented")
 
 
 def _sort_by_length(ids, mask, bsize):
@@ -46,6 +65,6 @@ def _sort_by_length(ids, mask, bsize):
 def _split_into_batches(ids, mask, bsize):
     batches = []
     for offset in range(0, ids.size(0), bsize):
-        batches.append((ids[offset:offset+bsize], mask[offset:offset+bsize]))
+        batches.append((ids[offset : offset + bsize], mask[offset : offset + bsize]))
 
     return batches

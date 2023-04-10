@@ -1,0 +1,6 @@
+#+TITLE: ColBERT-X Todos
+
+* TODO Implement tensorize_query_document [[file:xlmr_colbert/modeling/tokenization/utils.py::def tensorize_queries_documents(][link]]
+* TODO Implement pretraining.py [[file:xlmr_colbert/training/pretraining.py][link]]
+* TODO Implement bilingual_training.py [[file:xlmr_colbert/training/bilingual_training.py][link]]
+* TODO Update train.py with pretraining and bilingual_training [[file:xlmr_colbert/train.py][link]]

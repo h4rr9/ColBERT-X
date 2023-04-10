@@ -14,14 +14,20 @@ from xlmr_colbert.ranking.faiss_index import FaissIndex
 
 
 def batch_retrieve(args):
-    assert args.retrieve_only, "TODO: Combine batch (multi-query) retrieval with batch re-ranking"
+    assert (
+        args.retrieve_only
+    ), "TODO: Combine batch (multi-query) retrieval with batch re-ranking"
 
-    faiss_index = FaissIndex(args.index_path, args.faiss_index_path, args.nprobe, args.part_range)
+    faiss_index = FaissIndex(
+        args.index_path, args.faiss_index_path, args.nprobe, args.part_range
+    )
     inference = ModelInference(args.colbert, amp=args.amp)
 
     ranking_logger = RankingLogger(Run.path, qrels=None)
 
-    with ranking_logger.context('unordered.tsv', also_save_annotations=False) as rlogger:
+    with ranking_logger.context(
+        "unordered.tsv", also_save_annotations=False
+    ) as rlogger:
         queries = args.queries
         qids_in_order = list(queries.keys())
 
@@ -44,7 +50,7 @@ def batch_retrieve(args):
                 ranking = [(None, pid, None) for pid in ranking]
                 rlogger.log(qid, ranking, is_ranked=False)
 
-    print('\n\n')
+    print("\n\n")
     print(ranking_logger.filename)
     print("#> Done.")
-    print('\n\n')
+    print("\n\n")

@@ -6,12 +6,15 @@ from xlmr_colbert.modeling.tokenization import (
     QueryTokenizer,
     DocTokenizer,
     tensorize_triples,
+    tensorize_queries_documents,
 )
 
 from xlmr_colbert.utils.runs import Run
 
+import numpy as np
 
-class LazyBatcher:
+
+class PreTrainingBatcher:
     def __init__(self, args, rank=0, nranks=1):
         self.bsize, self.accumsteps = args.bsize, args.accumsteps
 
@@ -20,33 +23,18 @@ class LazyBatcher:
         self.tensorize_triples = partial(
             tensorize_triples, self.query_tokenizer, self.doc_tokenizer
         )
+        self.tensorize_quries = partial(tensorize_queries, self.query_tokenizer)
         self.position = 0
 
-        self.triples = self._load_triples(args.triples, rank, nranks)
-        self.queries = self._load_queries(args.queries)
-        self.collection = self._load_collection(args.collection)
+        self.queries_lang_a = self._load_queries(args.queries_lang_a)
+        self.queries_lang_b = self._load_queries(args.queries_lang_b)
+        self.collection_lang_a = self._load_collection(args.collection_lang_a)
+        self.collection_lang_b = self._load_collection(args.collection_lang_b)
 
-    def _load_triples(self, path, rank, nranks):
-        """
-        NOTE: For distributed sampling, this isn't equivalent to perfectly uniform sampling.
-        In particular, each subset is perfectly represented in every batch! However, since we never
-        repeat passes over the data, we never repeat any particular triple, and the split across
-        nodes is random (since the underlying file is pre-shuffled), there's no concern here.
-        """
-        print_message("#> Loading triples...")
-
-        triples = []
-
-        with open(path) as f:
-            for line_idx, line in enumerate(f):
-                if line_idx % nranks == rank:
-                    qid, pos, neg = ujson.loads(line)
-                    triples.append((qid, pos, neg))
-
-        return triples
+        self.rng = np.random.default_rng()
 
     def _load_queries(self, path):
-        print_message("#> Loading queries...")
+        print_message(f"#> Loading queries from {path}...")
 
         queries = {}
 
@@ -59,7 +47,7 @@ class LazyBatcher:
         return queries
 
     def _load_collection(self, path):
-        print_message("#> Loading collection...")
+        print_message(f"#> Loading collection from {path}...")
 
         collection = []
 
@@ -88,27 +76,41 @@ class LazyBatcher:
         if offset + self.bsize > len(self.triples):
             raise StopIteration
 
-        queries, positives, negatives = [], [], []
+        queries_a, queries_b = [], []
+        collections_a, collections_b = [], []
 
         for position in range(offset, endpos):
-            query, pos, neg = self.triples[position]
-            query, pos, neg = (
-                self.queries[query],
-                self.collection[pos],
-                self.collection[neg],
+            query_a, query_b = (
+                self.queries_lang_a[position],
+                self.queries_lang_b[position],
+            )
+            collection_a, collection_b = (
+                self.collection_lang_a[position],
+                self.collection_lang_b[position],
             )
 
-            queries.append(query)
-            positives.append(pos)
-            negatives.append(neg)
+            queries_a.append(query_a)
+            queries_b.append(query_b)
+            collections_a.append(collection_a)
+            collections_b.append(collection_b)
 
-        return self.collate(queries, positives, negatives)
+        return self.collate(queries_a, queries_b, collections_a, collections_b)
 
-    def collate(self, queries, positives, negatives):
-        assert len(queries) == len(positives) == len(negatives) == self.bsize
+    def collate(self, queries_a, queries_b, collections_a, collections_b):
+        assert (
+            len(queries_a)
+            == len(queries_b)
+            == len(collections_a)
+            == len(collections_b)
+            == self.bsize
+        )
 
-        return self.tensorize_triples(
-            queries, positives, negatives, self.bsize // self.accumsteps
+        return self.tensorize_queries_documents(
+            queries_a,
+            queries_b,
+            collections_a,
+            collections_b,
+            self.bsize // self.accumsteps,
         )
 
     def skip_to_batch(self, batch_idx, intended_batch_size):

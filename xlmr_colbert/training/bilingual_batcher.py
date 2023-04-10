@@ -10,8 +10,10 @@ from xlmr_colbert.modeling.tokenization import (
 
 from xlmr_colbert.utils.runs import Run
 
+import numpy as np
 
-class LazyBatcher:
+
+class BilingualBatcher:
     def __init__(self, args, rank=0, nranks=1):
         self.bsize, self.accumsteps = args.bsize, args.accumsteps
 
@@ -23,8 +25,12 @@ class LazyBatcher:
         self.position = 0
 
         self.triples = self._load_triples(args.triples, rank, nranks)
-        self.queries = self._load_queries(args.queries)
-        self.collection = self._load_collection(args.collection)
+        self.queries_lang_a = self._load_queries(args.queries_lang_a)
+        self.queries_lang_b = self._load_queries(args.queries_lang_b)
+        self.collection_lang_a = self._load_collection(args.collection_lang_a)
+        self.collection_lang_b = self._load_collection(args.collection_lang_b)
+
+        self.rng = np.random.default_rng()
 
     def _load_triples(self, path, rank, nranks):
         """
@@ -33,7 +39,7 @@ class LazyBatcher:
         repeat passes over the data, we never repeat any particular triple, and the split across
         nodes is random (since the underlying file is pre-shuffled), there's no concern here.
         """
-        print_message("#> Loading triples...")
+        print_message(f"#> Loading triples from {path}...")
 
         triples = []
 
@@ -46,7 +52,7 @@ class LazyBatcher:
         return triples
 
     def _load_queries(self, path):
-        print_message("#> Loading queries...")
+        print_message(f"#> Loading queries from {path}...")
 
         queries = {}
 
@@ -59,7 +65,7 @@ class LazyBatcher:
         return queries
 
     def _load_collection(self, path):
-        print_message("#> Loading collection...")
+        print_message(f"#> Loading collection from {path}...")
 
         collection = []
 
@@ -92,6 +98,25 @@ class LazyBatcher:
 
         for position in range(offset, endpos):
             query, pos, neg = self.triples[position]
+
+            query = (
+                self.queries_lang_a[query]
+                if self.rng.random() < 0.5
+                else self.queries_lang_b[query]
+            )
+
+            pos = (
+                self.collections_lang_a[query]
+                if self.rng.random() < 0.5
+                else self.collections_lang_b[query]
+            )
+
+            neg = (
+                self.collections_lang_a[query]
+                if self.rng.random() < 0.5
+                else self.collections_lang_b[query]
+            )
+
             query, pos, neg = (
                 self.queries[query],
                 self.collection[pos],

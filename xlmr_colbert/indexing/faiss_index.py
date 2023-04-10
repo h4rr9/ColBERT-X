@@ -10,7 +10,7 @@ from xlmr_colbert.indexing.faiss_index_gpu import FaissIndexGPU
 from xlmr_colbert.utils.utils import print_message
 
 
-class FaissIndex():
+class FaissIndex:
     def __init__(self, dim, partitions):
         self.dim = dim
         self.partitions = partitions

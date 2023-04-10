@@ -5,7 +5,7 @@ import numpy as np
 from xlmr_colbert.utils.utils import print_message
 
 
-class IndexManager():
+class IndexManager:
     def __init__(self, dim):
         self.dim = dim
 
