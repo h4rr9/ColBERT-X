@@ -80,15 +80,48 @@ class Arguments:
 
         self.checks.append(check_training_input)
 
+    def add_pretraining_input(self):
+        self.add_argument(
+            "--base_model", dest="base_model", default="xlm-roberta-large"
+        )
+        self.add_argument("--query_triples", dest="query_triples", required=True)
+        self.add_argument(
+            "--collection_triples", dest="collection_triples", required=True
+        )
+        self.add_argument("--queries_lang_a", dest="queries_lang_a", default=None)
+        self.add_argument("--queries_lang_b", dest="querie_lang_bs", default=None)
+        self.add_argument("--collection_lang_a", dest="collection_lang_a", default=None)
+        self.add_argument("--collection_lang_b", dest="collection_lang_b", default=None)
+
+        def check_pretraining_input(args):
+            assert (
+                args.query_triples is not None
+            ) and args.collection_triples is not None, (
+                "Specify the query and collection triples files",
+                "via --{query,collection}_triples",
+            )
+            assert (
+                (args.collection_lang_a is not None)
+                and (args.queries_lang_a is not None)(
+                    args.collection_lang_b is not None
+                )
+                and (args.queries_lang_b is not None)
+            ), (
+                "For Bilingual training, qureis and collections for both languages must be specified"
+                "via --queries_lang_{a,b} and --collection_lang_{a,b}"
+            )
+
+        self.checks.append(check_pretraining_input)
+
     def add_bilingual_training_input(self):
         self.add_argument(
             "--base_model", dest="base_model", default="xlm-roberta-large"
         )
         self.add_argument("--triples", dest="triples", required=True)
-        self.add_argument("--queries_lang_a", dest="queries", default=None)
-        self.add_argument("--queries_lang_b", dest="queries", default=None)
-        self.add_argument("--collection_lang_a", dest="collection", default=None)
-        self.add_argument("--collection_lang_b", dest="collection", default=None)
+        self.add_argument("--queries_lang_a", dest="queries_lang_a", default=None)
+        self.add_argument("--queries_lang_b", dest="querie_lang_bs", default=None)
+        self.add_argument("--collection_lang_a", dest="collection_lang_a", default=None)
+        self.add_argument("--collection_lang_b", dest="collection_lang_b", default=None)
 
         def check_bilingual_training_input(args):
             assert (

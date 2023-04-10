@@ -6,12 +6,16 @@ from xlmr_colbert.utils.utils import print_message, save_checkpoint
 from xlmr_colbert.parameters import SAVED_CHECKPOINTS
 
 
-def print_progress(scores):
+def print_progress(scores, prefix=""):
     positive_avg, negative_avg = round(scores[:, 0].mean().item(), 2), round(
         scores[:, 1].mean().item(), 2
     )
     print(
-        "#>>>   ", positive_avg, negative_avg, "\t\t|\t\t", positive_avg - negative_avg
+        f"#{prefix}>>>   ",
+        positive_avg,
+        negative_avg,
+        "\t\t|\t\t",
+        positive_avg - negative_avg,
     )
 
 

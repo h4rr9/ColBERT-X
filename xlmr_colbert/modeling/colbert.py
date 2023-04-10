@@ -1,4 +1,3 @@
-import string
 import torch
 import torch.nn as nn
 
@@ -47,6 +46,12 @@ class ColBERT(RobertaPreTrainedModel):
 
     def forward(self, Q, D):
         return self.score(self.query(*Q), self.doc(*D))
+
+    def forward_query(self, Q_a, Q_b):
+        return self.score(self.query(*Q_a), self.query(*Q_b))
+
+    def forward_document(self, D_a, D_b):
+        return self.score(self.doc(*D_a), self.doc(*D_b))
 
     def query(self, input_ids, attention_mask):
         input_ids, attention_mask = input_ids.to(DEVICE), attention_mask.to(DEVICE)

@@ -39,17 +39,75 @@ def tensorize_triples(
 
 def tensorize_queries_documents(
     query_tokenizer,
-    document_tokenizer,
-    queries_a,
-    queries_b,
-    documents_a,
-    documents_b,
+    doc_tokenizer,
+    queries,
+    queries_positive,
+    queries_negative,
+    documents,
+    documents_positive,
+    documents_negative,
     bsize,
 ):
     # TODO: implement query document tensorize
-    assert len(queries_a) == len(queries_b) == len(documents_a) == len(documents_b)
-    assert bsize is None or len(queries_a) % bsize == 0
-    raise NotImplementedError("Tensorize Queries and Documents not implemented")
+    assert (
+        len(queries)
+        == len(queries_positive)
+        == len(queries_negative)
+        == len(documents)
+        == len(documents_positive)
+        == len(documents_negative)
+    )
+    assert bsize is None or len(queries) % bsize == 0
+
+    N = len(queries)
+
+    Q_ids, Q_mask = query_tokenizer.tensorize(queries)
+    Qpn_ids, Qpn_mask = query_tokenizer.tensorize(queries_positive + queries_negative)
+    Qpn_ids, Qpn_mask = Qpn_ids.view(2, N, -1), Qpn_mask.view(2, N, -1)
+
+    maxlens = Qpn_mask.sum(-1).max(0).values
+    indices = maxlens.sort().indices
+    Q_ids, Q_mask = Q_ids[indices], Q_mask[indices]
+    Qpn_ids, Qpn_mask = Qpn_ids[:, indices], Qpn_mask[:, indices]
+
+    (positive_ids, negative_ids), (positive_mask, negative_mask) = Qpn_ids, Qpn_mask
+
+    query_batches = _split_into_batches(Q_ids, Q_mask, bsize)
+    query_positive_batches = _split_into_batches(positive_ids, positive_mask, bsize)
+    query_negative_batches = _split_into_batches(negative_ids, negative_mask, bsize)
+
+    query_batches = []
+    for (q_ids, q_mask), (qp_ids, qp_mask), (qn_ids, qn_mask) in zip(
+        query_batches, query_positive_batches, query_negative_batches
+    ):
+        Q = (torch.cat((q_ids, q_ids)), torch.cat((q_mask, q_mask)))
+        Qpn = (torch.cat((qp_ids, qn_ids)), torch.cat((qp_mask, qn_mask)))
+        query_batches.append((Q, Qpn))
+
+    D_ids, D_mask = doc_tokenizer.tensorize(documents)
+    Dpn_ids, Dpn_mask = doc_tokenizer.tensorize(documents_positive + documents_negative)
+    Dpn_ids, Dpn_mask = Dpn_ids.view(2, N, -1), Dpn_mask.view(2, N, -1)
+
+    maxlens = Dpn_mask.sum(-1).max(0).values
+    indices = maxlens.sort().indices
+    D_ids, D_mask = D_ids[indices], D_mask[indices]
+    Dpn_ids, Dpn_mask = Dpn_ids[:, indices], Dpn_mask[:, indices]
+
+    (positive_ids, negative_ids), (positive_mask, negative_mask) = Dpn_ids, Dpn_mask
+
+    doc_batches = _split_into_batches(D_ids, D_mask, bsize)
+    doc_positive_batches = _split_into_batches(positive_ids, positive_mask, bsize)
+    doc_negative_batches = _split_into_batches(negative_ids, negative_mask, bsize)
+
+    doc_batches = []
+    for (q_ids, q_mask), (qp_ids, qp_mask), (qn_ids, qn_mask) in zip(
+        doc_batches, doc_positive_batches, doc_negative_batches
+    ):
+        D = (torch.cat((q_ids, q_ids)), torch.cat((q_mask, q_mask)))
+        Dpn = (torch.cat((qp_ids, qn_ids)), torch.cat((qp_mask, qn_mask)))
+        doc_batches.append((D, Dpn))
+
+    return zip(query_batches, doc_batches)
 
 
 def _sort_by_length(ids, mask, bsize):
