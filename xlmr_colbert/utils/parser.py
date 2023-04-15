@@ -89,7 +89,7 @@ class Arguments:
             "--collection_triples", dest="collection_triples", required=True
         )
         self.add_argument("--queries_lang_a", dest="queries_lang_a", default=None)
-        self.add_argument("--queries_lang_b", dest="querie_lang_bs", default=None)
+        self.add_argument("--queries_lang_b", dest="queries_lang_b", default=None)
         self.add_argument("--collection_lang_a", dest="collection_lang_a", default=None)
         self.add_argument("--collection_lang_b", dest="collection_lang_b", default=None)
 
@@ -102,7 +102,7 @@ class Arguments:
             )
             assert (
                 (args.collection_lang_a is not None)
-                and (args.queries_lang_a is not None)(
+                and (args.queries_lang_a is not None) and (
                     args.collection_lang_b is not None
                 )
                 and (args.queries_lang_b is not None)
@@ -119,7 +119,7 @@ class Arguments:
         )
         self.add_argument("--triples", dest="triples", required=True)
         self.add_argument("--queries_lang_a", dest="queries_lang_a", default=None)
-        self.add_argument("--queries_lang_b", dest="querie_lang_bs", default=None)
+        self.add_argument("--queries_lang_b", dest="queries_lang_b", default=None)
         self.add_argument("--collection_lang_a", dest="collection_lang_a", default=None)
         self.add_argument("--collection_lang_b", dest="collection_lang_b", default=None)
 
