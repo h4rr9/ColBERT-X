@@ -23,14 +23,14 @@ class PreTrainingBatcher:
         self.position = 0
 
         self.query_triples = self._load_triples(args.query_triples, rank, nranks)
-        self.document_triples = self._load_triples(args.document_triples, rank, nranks)
+        self.collection_triples = self._load_triples(args.collection_triples, rank, nranks)
         self.queries_lang_a = self._load_queries(args.queries_lang_a)
         self.queries_lang_b = self._load_queries(args.queries_lang_b)
         self.collection_lang_a = self._load_collection(args.collection_lang_a)
         self.collection_lang_b = self._load_collection(args.collection_lang_b)
 
         assert len(self.query_triples) == len(
-            self.document_triples
+            self.collection_triples
         ), "Expected query and document triples to have same length"
 
     def _load_triples(self, path, rank, nranks):

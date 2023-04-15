@@ -126,9 +126,8 @@ class Arguments:
         def check_bilingual_training_input(args):
             assert (
                 (args.collection_lang_a is not None)
-                and (args.queries_lang_a is not None)(
-                    args.collection_lang_b is not None
-                )
+                and (args.queries_lang_a is not None)
+                and (args.collection_lang_b is not None)
                 and (args.queries_lang_b is not None)
             ), (
                 "For Bilingual training, qureis and collections for both languages must be specified"

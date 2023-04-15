@@ -4,3 +4,5 @@
 * DONE Implement pretraining.py [[file:xlmr_colbert/training/pretraining.py][link]]
 * DONE Implement bilingual_training.py [[file:xlmr_colbert/training/bilingual_training.py][link]]
 * DONE Update train.py with pretraining and bilingual_training [[file:xlmr_colbert/train.py][link]]
+* TODO Generate data files and (upload to huggingface/create bash script to download datafiles from huggingface)
+* TODO Test end to end
