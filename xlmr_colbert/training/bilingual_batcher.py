@@ -105,21 +105,15 @@ class BilingualBatcher:
             )
 
             pos = (
-                self.collections_lang_a[query]
+                self.collections_lang_a[pos]
                 if self.rng.random() < 0.5
-                else self.collections_lang_b[query]
+                else self.collections_lang_b[pos]
             )
 
             neg = (
-                self.collections_lang_a[query]
+                self.collections_lang_a[neg]
                 if self.rng.random() < 0.5
-                else self.collections_lang_b[query]
-            )
-
-            query, pos, neg = (
-                self.queries[query],
-                self.collection[pos],
-                self.collection[neg],
+                else self.collections_lang_b[neg]
             )
 
             queries.append(query)
