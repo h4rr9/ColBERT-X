@@ -27,8 +27,8 @@ class BilingualBatcher:
         self.triples = self._load_triples(args.triples, rank, nranks)
         self.queries_lang_a = self._load_queries(args.queries_lang_a)
         self.queries_lang_b = self._load_queries(args.queries_lang_b)
-        self.collection_lang_a = self._load_collection(args.collection_lang_a)
-        self.collection_lang_b = self._load_collection(args.collection_lang_b)
+        self.collections_lang_a = self._load_collection(args.collection_lang_a)
+        self.collections_lang_b = self._load_collection(args.collection_lang_b)
 
         self.rng = np.random.default_rng()
 
