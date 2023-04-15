@@ -115,8 +115,7 @@ def train(args):
                 loss = loss / args.accumsteps
 
             if args.rank < 1:
-                print_progress(query_scores, prefix=" query ")
-                print_progress(doc_scores, prefix=" doc ")
+                print_progress(scores)
 
             amp.backward(loss)
 
