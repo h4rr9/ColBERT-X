@@ -72,10 +72,9 @@ class PreTrainingBatcher:
 
         with open(path) as f:
             for line_idx, line in enumerate(f):
-                pid, passage, title = line.strip().split("\t")
+                pid, passage = line.strip().split("\t")
                 assert pid == "id" or int(pid) == line_idx
 
-                passage = title + " | " + passage
                 collection.append(passage)
 
         return collection
