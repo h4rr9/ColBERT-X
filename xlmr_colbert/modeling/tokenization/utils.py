@@ -107,7 +107,7 @@ def tensorize_queries_documents(
         Dpn = (torch.cat((dp_ids, dn_ids)), torch.cat((dp_mask, dn_mask)))
         doc_batches.append((D, Dpn))
 
-    return list(zip(query_batches, doc_batches))
+    return zip(query_batches, doc_batches)
 
 
 def _sort_by_length(ids, mask, bsize):

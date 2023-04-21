@@ -85,7 +85,7 @@ class PreTrainingBatcher:
         return self
 
     def __len__(self):
-        return len(self.triples)
+        return len(self.query_triples)
 
     def __next__(self):
         offset, endpos = self.position, min(
