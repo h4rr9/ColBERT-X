@@ -97,7 +97,7 @@ class PreTrainingBatcher:
             raise StopIteration
 
         queries, queries_positive, queries_negative = [], [], []
-        collections, collections_positive, collections_negative = [], []
+        collections, collections_positive, collections_negative = [], [], []
 
         for position in range(offset, endpos):
             query, query_pos, query_neg = self.query_triples[position]
