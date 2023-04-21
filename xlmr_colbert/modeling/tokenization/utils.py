@@ -78,11 +78,15 @@ def tensorize_queries_documents(
     (positive_ids, negative_ids), (positive_mask, negative_mask) = Qpn_ids, Qpn_mask
 
 
-    print(f"Q_ids {Q_ids.shape} positive_ids {positive_ids.shape}, negative_ids {negative_ids.shape}")
 
     query_batches = _split_into_batches(Q_ids, Q_mask, bsize)
     query_positive_batches = _split_into_batches(positive_ids, positive_mask, bsize)
     query_negative_batches = _split_into_batches(negative_ids, negative_mask, bsize)
+
+
+    print(f"query_batches {len(query_batches)}")
+    print(f"query_positive_batches {len(query_positive_batches)}")
+    print(f"query_negative_batches {len(query_negative_batches)}")
 
     query_batches = []
     for (q_ids, q_mask), (qp_ids, qp_mask), (qn_ids, qn_mask) in zip(
