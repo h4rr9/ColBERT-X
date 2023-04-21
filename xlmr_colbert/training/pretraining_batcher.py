@@ -93,7 +93,7 @@ class PreTrainingBatcher:
         )
         self.position = endpos
 
-        if offset + self.bsize > len(self.triples):
+        if offset + self.bsize > len(self.query_triples):
             raise StopIteration
 
         queries, queries_positive, queries_negative = [], [], []
