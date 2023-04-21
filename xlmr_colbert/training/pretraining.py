@@ -110,7 +110,8 @@ def train(args):
     for batch_idx, BatchSteps in zip(range(start_batch_idx, args.maxsteps), reader):
         this_batch_loss = 0.0
 
-        for ((queries, queries_pn), (doc, doc_pn)) in BatchSteps:
+        for (queries, queries_pn), (doc, doc_pn) in BatchSteps:
+            print(f"queries {queries.shape} doc {doc.shape}")
             with amp.context():
                 query_scores = (
                     colbert.forward_query(queries, queries_pn).view(2, -1).permute(1, 0)
@@ -120,17 +121,18 @@ def train(args):
                 doc_loss = criterion(doc_scores, labels[0, doc_scores.size(0)])
                 loss = (query_loss + doc_loss) / 2.0
                 loss = loss / args.accumsteps
-                print("HERE HERE")
 
             if args.rank < 1:
                 print_progress(query_scores, prefix=" query ")
                 print_progress(doc_scores, prefix=" doc ")
 
+            print("BACKWARD")
             amp.backward(loss)
 
             train_loss += loss.item()
             this_batch_loss += loss.item()
 
+        print("STEP")
         amp.step(colbert, optimizer)
 
         if args.rank < 1:
