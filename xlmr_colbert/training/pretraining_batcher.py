@@ -111,7 +111,7 @@ class PreTrainingBatcher:
                 self.queries_lang_b[query_neg],
             )
             collection, collection_pos, collection_neg = (
-                self.colletions_lang_a[collection],
+                self.collections_lang_a[collection],
                 self.collections_lang_b[collection_pos],
                 self.collections_lang_b[collection_neg],
             )
