@@ -66,14 +66,19 @@ def tensorize_queries_documents(
     Qpn_ids, Qpn_mask = Qpn_ids.view(2, N, -1), Qpn_mask.view(2, N, -1)
 
 
-    print(f"Q_ids {Q_ids.shape}")
 
     maxlens = Qpn_mask.sum(-1).max(0).values
     indices = maxlens.sort().indices
     Q_ids, Q_mask = Q_ids[indices], Q_mask[indices]
     Qpn_ids, Qpn_mask = Qpn_ids[:, indices], Qpn_mask[:, indices]
 
+
+
+
     (positive_ids, negative_ids), (positive_mask, negative_mask) = Qpn_ids, Qpn_mask
+
+
+    print(f"Q_ids {Q_ids.shape} positive_ids {positive_ids.shape}, negative_ids {negative_ids.shape}")
 
     query_batches = _split_into_batches(Q_ids, Q_mask, bsize)
     query_positive_batches = _split_into_batches(positive_ids, positive_mask, bsize)
