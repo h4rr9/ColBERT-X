@@ -120,6 +120,7 @@ def train(args):
                 doc_loss = criterion(doc_scores, labels[0, doc_scores.size(0)])
                 loss = (query_loss + doc_loss) / 2.0
                 loss = loss / args.accumsteps
+                print("HERE HERE")
 
             if args.rank < 1:
                 print_progress(query_scores, prefix=" query ")
