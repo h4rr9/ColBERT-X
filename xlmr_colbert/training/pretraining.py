@@ -110,7 +110,7 @@ def train(args):
     for batch_idx, BatchSteps in zip(range(start_batch_idx, args.maxsteps), reader):
         this_batch_loss = 0.0
 
-        for (queries, queries_pn), (doc, doc_pn) in BatchSteps:
+        for ((queries, queries_pn), (doc, doc_pn)) in BatchSteps:
             with amp.context():
                 query_scores = (
                     colbert.forward_query(queries, queries_pn).view(2, -1).permute(1, 0)
