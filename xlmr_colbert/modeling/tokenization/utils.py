@@ -65,6 +65,9 @@ def tensorize_queries_documents(
     Qpn_ids, Qpn_mask = query_tokenizer.tensorize(queries_positive + queries_negative)
     Qpn_ids, Qpn_mask = Qpn_ids.view(2, N, -1), Qpn_mask.view(2, N, -1)
 
+
+    print(f"Q_ids {Q_ids.shape}")
+
     maxlens = Qpn_mask.sum(-1).max(0).values
     indices = maxlens.sort().indices
     Q_ids, Q_mask = Q_ids[indices], Q_mask[indices]
