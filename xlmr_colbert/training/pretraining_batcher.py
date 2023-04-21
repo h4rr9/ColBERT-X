@@ -100,6 +100,7 @@ class PreTrainingBatcher:
         collections, collections_positive, collections_negative = [], [], []
 
         for position in range(offset, endpos):
+            print("HERE HERE")
             query, query_pos, query_neg = self.query_triples[position]
             collection, collection_pos, collection_neg = self.collection_triples[
                 position
@@ -122,6 +123,7 @@ class PreTrainingBatcher:
             collections.append(collection)
             collections_positive.append(collection_pos)
             collections_negative.append(collection_neg)
+        print(f" queries {len(queries)}")
 
         return self.collate(
             queries,
