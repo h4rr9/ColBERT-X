@@ -83,6 +83,7 @@ def tensorize_queries_documents(
         Q = (torch.cat((q_ids, q_ids)), torch.cat((q_mask, q_mask)))
         Qpn = (torch.cat((qp_ids, qn_ids)), torch.cat((qp_mask, qn_mask)))
         query_batches.append((Q, Qpn))
+    print(f"query_batches {len(query_batches)}")
 
     D_ids, D_mask = doc_tokenizer.tensorize(documents)
     Dpn_ids, Dpn_mask = doc_tokenizer.tensorize(documents_positive + documents_negative)
@@ -106,6 +107,8 @@ def tensorize_queries_documents(
         D = (torch.cat((d_ids, d_ids)), torch.cat((d_mask, d_mask)))
         Dpn = (torch.cat((dp_ids, dn_ids)), torch.cat((dp_mask, dn_mask)))
         doc_batches.append((D, Dpn))
+    print(f"doc_batches {len(doc_batches)}")
+
 
     return zip(query_batches, doc_batches)
 
