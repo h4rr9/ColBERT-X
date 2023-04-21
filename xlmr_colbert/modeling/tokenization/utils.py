@@ -65,37 +65,24 @@ def tensorize_queries_documents(
     Qpn_ids, Qpn_mask = query_tokenizer.tensorize(queries_positive + queries_negative)
     Qpn_ids, Qpn_mask = Qpn_ids.view(2, N, -1), Qpn_mask.view(2, N, -1)
 
-
-
     maxlens = Qpn_mask.sum(-1).max(0).values
     indices = maxlens.sort().indices
     Q_ids, Q_mask = Q_ids[indices], Q_mask[indices]
     Qpn_ids, Qpn_mask = Qpn_ids[:, indices], Qpn_mask[:, indices]
 
-
-
-
     (positive_ids, negative_ids), (positive_mask, negative_mask) = Qpn_ids, Qpn_mask
-
-
 
     query_batches = _split_into_batches(Q_ids, Q_mask, bsize)
     query_positive_batches = _split_into_batches(positive_ids, positive_mask, bsize)
     query_negative_batches = _split_into_batches(negative_ids, negative_mask, bsize)
 
-
-    print(f"query_batches {len(query_batches)}")
-    print(f"query_positive_batches {len(query_positive_batches)}")
-    print(f"query_negative_batches {len(query_negative_batches)}")
-
-    query_batches = []
+    final_query_batches = []
     for (q_ids, q_mask), (qp_ids, qp_mask), (qn_ids, qn_mask) in zip(
         query_batches, query_positive_batches, query_negative_batches
     ):
         Q = (torch.cat((q_ids, q_ids)), torch.cat((q_mask, q_mask)))
         Qpn = (torch.cat((qp_ids, qn_ids)), torch.cat((qp_mask, qn_mask)))
-        query_batches.append((Q, Qpn))
-    print(f"query_batches {len(query_batches)}")
+        final_query_batches.append((Q, Qpn))
 
     D_ids, D_mask = doc_tokenizer.tensorize(documents)
     Dpn_ids, Dpn_mask = doc_tokenizer.tensorize(documents_positive + documents_negative)
@@ -112,17 +99,15 @@ def tensorize_queries_documents(
     doc_positive_batches = _split_into_batches(positive_ids, positive_mask, bsize)
     doc_negative_batches = _split_into_batches(negative_ids, negative_mask, bsize)
 
-    doc_batches = []
+    final_doc_batches = []
     for (d_ids, d_mask), (dp_ids, dp_mask), (dn_ids, dn_mask) in zip(
         doc_batches, doc_positive_batches, doc_negative_batches
     ):
         D = (torch.cat((d_ids, d_ids)), torch.cat((d_mask, d_mask)))
         Dpn = (torch.cat((dp_ids, dn_ids)), torch.cat((dp_mask, dn_mask)))
-        doc_batches.append((D, Dpn))
-    print(f"doc_batches {len(doc_batches)}")
+        final_doc_batches.append((D, Dpn))
 
-
-    return zip(query_batches, doc_batches)
+    return zip(final_query_batches, final_doc_batches)
 
 
 def _sort_by_length(ids, mask, bsize):
