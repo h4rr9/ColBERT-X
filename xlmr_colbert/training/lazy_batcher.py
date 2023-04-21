@@ -40,7 +40,7 @@ class LazyBatcher:
         with open(path) as f:
             for line_idx, line in enumerate(f):
                 if line_idx % nranks == rank:
-                    qid, pos, neg = ujson.loads(line)
+                    qid, pos, neg = [int(id) for id in line.strip().split("\t")]
                     triples.append((qid, pos, neg))
 
         return triples
