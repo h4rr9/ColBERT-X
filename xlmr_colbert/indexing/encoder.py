@@ -70,6 +70,7 @@ class CollectionEncoder:
         ):
             if owner != self.process_idx:
                 continue
+            self.print(f"encoding batch #{batch_idx} (starting at passage #{offset})")
 
             t1 = time.time()
             batch = self._preprocess_batch(offset, lines)
