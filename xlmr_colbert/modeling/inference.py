@@ -6,6 +6,9 @@ from xlmr_colbert.utils.amp import MixedPrecisionManager
 from xlmr_colbert.parameters import DEVICE
 
 
+from tqdm.auto import tqdm
+
+
 class ModelInference:
     def __init__(self, colbert: ColBERT, amp=False):
         assert colbert.training is False
@@ -74,7 +77,7 @@ class ModelInference:
 
             batches = [
                 self.doc(input_ids, attention_mask, keep_dims=keep_dims, to_cpu=to_cpu)
-                for input_ids, attention_mask in batch_ids
+                for input_ids, attention_mask in tqdm(batch_ids)
             ]
             print("batches len = %d " % len(batches))
 
