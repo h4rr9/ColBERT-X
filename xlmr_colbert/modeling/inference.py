@@ -28,7 +28,9 @@ class ModelInference:
     def doc(self, *args, to_cpu=False, **kw_args):
         with torch.no_grad():
             with self.amp_manager.context():
+                print("BEFORE model")
                 D = self.colbert.doc(*args, **kw_args)
+                print("AFTER model")
                 return D.cpu() if to_cpu else D
 
     #    def queryFromText(self, queries, bsize=None, to_cpu=False):
