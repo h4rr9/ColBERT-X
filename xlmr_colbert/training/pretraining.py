@@ -115,9 +115,11 @@ def train(args):
                 query_scores = (
                     colbert.forward_query(queries, queries_pn).view(2, -1).permute(1, 0)
                 )
-                doc_scores = colbert.forward_document(doc, doc_pn).view(2, -1).permute(1, 0)
-                query_loss = criterion(query_scores, labels[0: query_scores.size(0)])
-                doc_loss = criterion(doc_scores, labels[0: doc_scores.size(0)])
+                doc_scores = (
+                    colbert.forward_document(doc, doc_pn).view(2, -1).permute(1, 0)
+                )
+                query_loss = criterion(query_scores, labels[0 : query_scores.size(0)])
+                doc_loss = criterion(doc_scores, labels[0 : doc_scores.size(0)])
                 loss = (query_loss + doc_loss) / 2.0
                 loss = loss / args.accumsteps
 

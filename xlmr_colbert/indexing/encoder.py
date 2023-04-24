@@ -74,15 +74,11 @@ class CollectionEncoder:
 
             t1 = time.time()
             batch = self._preprocess_batch(offset, lines)
-            self.print("HERE0")
             embs, doclens, ids = self._encode_batch(batch_idx, batch)
-
-            self.print("HEREA")
 
             t2 = time.time()
             self.saver_queue.put((batch_idx, embs, offset, doclens, ids))
 
-            self.print("HEREB")
             t3 = time.time()
             local_docs_processed += len(lines)
             overall_throughput = compute_throughput(local_docs_processed, t0, t3)
